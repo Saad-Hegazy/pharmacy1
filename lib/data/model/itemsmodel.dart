@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+import '../../core/services/services.dart';
 
 class ItemsModel {
   int? itemsId;
@@ -11,13 +13,7 @@ class ItemsModel {
   int? itemsquantityinbox;
   num? itemsPrice;
   num? itemspricrofbox;
-  num? itemspricrofboxmerchant;
-  num? itemspricrofboxmosque;
-  num? itemsPriceMerchant;
-  num? itemsPriceMosque;
   num? itemsDescount;
-  num? itemsDescountMosque;
-  num? itemsDescountMerchant;
   String? itemsDate;
   int? itemsCat;
   int? categoriesId;
@@ -38,13 +34,7 @@ class ItemsModel {
         this.itemsquantityinbox,
         this.itemsPrice,
         this.itemspricrofbox,
-        this.itemspricrofboxmerchant,
-        this.itemspricrofboxmosque,
-        this.itemsPriceMerchant,
-        this.itemsPriceMosque,
         this.itemsDescount,
-        this.itemsDescountMosque,
-        this.itemsDescountMerchant,
         this.itemsDate,
         this.itemsCat,
         this.categoriesId,
@@ -53,6 +43,7 @@ class ItemsModel {
         this.categoriesImage,
         this.categoriesDatetime,
         this.favorite});
+  MyServices myServices = Get.find();
 
   ItemsModel.fromJson(Map<dynamic, dynamic> json) {
     itemsId = json['items_id'];
@@ -66,13 +57,7 @@ class ItemsModel {
     itemsquantityinbox = json['items_quantityinbox'];
     itemsPrice = json['items_price'];
     itemspricrofbox = json['items_pricrofbox'];
-    itemspricrofboxmerchant = json['items_pricrofbox_merchant'];
-    itemspricrofboxmosque = json['items_pricrofbox_mosque'];
-    itemsPriceMerchant = json['items_price_merchant'];
-    itemsPriceMosque = json['items_price_mosque'];
     itemsDescount = json['items_descount'];
-    itemsDescountMosque = json['items_descount_mosque'];
-    itemsDescountMerchant = json['items_descount_Merchant'];
     itemsDate = json['items_date'];
     itemsCat = json['items_cat'];
     categoriesId = json['categories_id'];
@@ -96,13 +81,7 @@ class ItemsModel {
     data['items_quantityinbox'] = itemsquantityinbox;
     data['items_price'] = itemsPrice;
     data['items_pricrofbox'] = itemspricrofbox;
-    data['items_pricrofbox_merchant'] = itemspricrofboxmerchant;
-    data['items_pricrofbox_mosque'] = itemspricrofboxmosque;
-    data['items_price_merchant'] = itemsPriceMerchant;
-    data['items_price_mosque'] = itemsPriceMosque;
     data['items_descount'] = itemsDescount;
-    data['items_descount_mosque'] = itemsDescountMosque;
-    data['items_descount_Merchant'] = itemsDescountMerchant;
     data['items_date'] = itemsDate;
     data['items_cat'] = itemsCat;
     data['categories_id'] = categoriesId;
@@ -112,4 +91,37 @@ class ItemsModel {
     data['categories_datetime'] = categoriesDatetime;
     return data;
   }
+
+  num? get itemPrice{
+            if(itemsDescount!>0){
+              return itemsPrice!- itemsPrice! * itemsDescount!/100;
+            }else{
+              return  itemsPrice!;
+            }
+  }
+
+  num? get itemPriceBox{
+        if(itemsDescount!>0){
+          return itemspricrofbox! - itemspricrofbox! * itemsDescount!/100;
+        }else{
+          return  itemspricrofbox!;
+        }
+  }
+
+  get amountofDiscount{
+        if(itemsDescount! >0){
+          return itemsDescount;
+        }else{
+          return 0 ;
+        }
+  }
+
+  get pricewithoutDiscount{
+        return  itemsPrice!;
+  }
+
+  get priceBoxwithoutDiscount{
+        return  itemsPrice! * itemsquantityinbox!;
+  }
+
 }

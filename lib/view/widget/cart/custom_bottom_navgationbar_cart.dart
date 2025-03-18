@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controller/cart_controller.dart';
+import '../../../controller/cartlocal_controller.dart';
 import '../../../core/constant/color.dart';
-import 'buttoncart.dart';
 import 'custombuttoncoupon.dart';
 
-class BottomNavgationBarCart extends GetView<CartController> {
+class BottomNavgationBarCart extends GetView<CartControllerLocal> {
   final String price;
   final String discount;
   final String totalprice;
@@ -23,12 +22,13 @@ class BottomNavgationBarCart extends GetView<CartController> {
   @override
   Widget build(BuildContext context) {
     return Container(
+        color: AppColor.backgroundcolor2,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            GetBuilder<CartController>(
+            GetBuilder<CartControllerLocal>(
                 builder: (controller) =>
-                controller.couponname == null ?
+                controller.couponname == "" ?
                 Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Row(children: [
@@ -38,11 +38,21 @@ class BottomNavgationBarCart extends GetView<CartController> {
                             style: TextStyle(color: Colors.black),
                             controller: controllercoupon,
                             decoration:  InputDecoration(
-                                isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 10),
-                                hintText: "125".tr,
-                                border: OutlineInputBorder()),
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 10),
+                              hintText: "125".tr,
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: AppColor.primaryColor
+                                ),),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: AppColor.primaryColor),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(color: AppColor.primaryColor),
+                              ),
+                            ),
                           )),
                       const SizedBox(width: 5),
                       Expanded(
@@ -52,7 +62,7 @@ class BottomNavgationBarCart extends GetView<CartController> {
                             onPressed: onApplyCoupon,
                           ))
                     ]))
-                    : Container(child: Text("127".tr+" ${controller.couponname!}" , style: const TextStyle(color: Colors.black , fontWeight: FontWeight.bold),))
+                    : Container(child: Text("127".tr+" ${controller.couponname}" , style: const TextStyle(color: Colors.black , fontWeight: FontWeight.bold),))
             ),
             Container(
               margin: const EdgeInsets.all(10),
@@ -69,7 +79,8 @@ class BottomNavgationBarCart extends GetView<CartController> {
                         child:  Text("128".tr, style: TextStyle(fontSize: 16,color: Colors.black))),
                     Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text("$price SAR", style: const TextStyle(fontSize: 16,color: Colors.black)))
+                        child: Text(price +"215".tr,
+                            style: const TextStyle(fontSize: 16,color: Colors.black)))
                   ],
                 ),
                 Row(
@@ -114,12 +125,6 @@ class BottomNavgationBarCart extends GetView<CartController> {
               ]),
             ),
             const SizedBox(height: 10),
-            CustomButtonCart(
-              textbutton: "132".tr,
-              onPressed: () {
-                controller.goToPageCheckout() ;
-              },
-            )
           ],
         ));
   }

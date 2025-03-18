@@ -16,7 +16,6 @@ class SignUpControllerImp extends SignUpController {
   late TextEditingController email;
   late TextEditingController phone;
   late TextEditingController password;
-  String? selectedUserType ;
   String? verification ;
   bool isshowpassword = true;
 
@@ -27,10 +26,7 @@ class SignUpControllerImp extends SignUpController {
   SignupData signupData = SignupData(Get.find());
 
   List data = [];
-  void setUserType(String type) {
-    selectedUserType = type;
-    update();
-  }
+
   @override
   signUp() async {
     if (formstate.currentState!.validate()) {
@@ -41,13 +37,11 @@ class SignUpControllerImp extends SignUpController {
               password.text,
               email.text,
               phone.text,
-              selectedUserType!,
             );
             print("=============================== signUpController $response ");
             statusRequest = handlingData(response);
             if (StatusRequest.success == statusRequest) {
               if (response['status'] == "success") {
-                // data.addAll(response['data']);
                 requestOTP(phone.text);
               } else {
                 Get.defaultDialog(title: "158".tr , middleText: "173".tr,middleTextStyle:TextStyle(color: Colors.black)) ;
@@ -120,7 +114,7 @@ class SignUpControllerImp extends SignUpController {
     phone = TextEditingController();
     email = TextEditingController();
     password = TextEditingController();
-    phone.text="+966";
+    phone.text="+20";
     super.onInit();
   }
 

@@ -2,23 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import '../constant/apptheme.dart';
-import '../functions/fcmconfig.dart';
 import '../services/services.dart';
 class LocaleController extends GetxController {
   Locale? language;
-
   MyServices myServices = Get.find();
-
   ThemeData appTheme = themeEnglish;
-
   changeLang(String langcode) {
     Locale locale = Locale(langcode);
+    Get.forceAppUpdate();
     myServices.sharedPreferences.setString("lang", langcode);
     appTheme = langcode == "ar" ? themeArabic : themeEnglish;
     Get.changeTheme(appTheme);
     Get.updateLocale(locale);
   }
-
   requestPerLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -39,7 +35,6 @@ class LocaleController extends GetxController {
       return Get.snackbar("137".tr, "138".tr);
     }
   }
-
   @override
   void onInit() {
     requestPerLocation();

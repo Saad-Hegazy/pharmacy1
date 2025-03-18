@@ -1,7 +1,6 @@
 class OrdersModel {
   int? ordersId;
   int? ordersUsersid;
-  String? ordersUserstype;
   int? ordersAddress;
   int? ordersType;
   num? ordersPricedelivery;
@@ -27,7 +26,6 @@ class OrdersModel {
   OrdersModel(
       {this.ordersId,
         this.ordersUsersid,
-        this.ordersUserstype,
         this.ordersAddress,
         this.ordersType,
         this.ordersPricedelivery,
@@ -52,7 +50,6 @@ class OrdersModel {
   OrdersModel.fromJson(Map<String, dynamic> json) {
     ordersId = json['orders_id'];
     ordersUsersid = json['orders_usersid'];
-    ordersUserstype = json['orders_userstype'];
     ordersAddress = json['orders_address'];
     ordersType = json['orders_type'];
     ordersPricedelivery = json['orders_pricedelivery'];
@@ -79,7 +76,6 @@ class OrdersModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['orders_id'] = ordersId;
     data['orders_usersid'] = ordersUsersid;
-    data['orders_userstype'] = ordersUserstype;
     data['orders_address'] = ordersAddress;
     data['orders_type'] = ordersType;
     data['orders_pricedelivery'] = ordersPricedelivery;

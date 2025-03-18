@@ -8,8 +8,6 @@ class FcmService{
       if (message.notification != null) {
         OrdersPendingController ordersPendingController= Get.put(OrdersPendingController());
         ordersPendingController.getOrders();
-        print(message.notification!.title);
-        print(message.notification!.body);
       }});}
 
 }

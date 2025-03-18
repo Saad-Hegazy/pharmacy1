@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controller/home_controller.dart';
+import '../../../core/constant/color.dart';
 import '../../../core/functions/translatefatabase.dart';
 import '../../../data/model/categoriesmodel.dart';
 import '../../../linkabi.dart';
@@ -11,22 +12,17 @@ class ListCategories extends GetView<HomeControllerImp> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150, // Adjust the height for the horizontal list
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal, // Enables horizontal scrolling
-        padding: const EdgeInsets.all(8.0),
-        itemCount: controller.categories.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 16.0), // Spacing between items
-            child: CategoryCard(
-              categoriesModel: CategoriesModel.fromJson(controller.categories[index]),
-              i: index,
-            ),
-          );
-        },
+    return  GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.8,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: controller.categories.length,
+      itemBuilder: (context, index) => CategoryCard(categoriesModel: CategoriesModel.fromJson(controller.categories[index]), i: index,),
     );
   }
 }
@@ -46,7 +42,7 @@ class CategoryCard extends GetView<HomeControllerImp> {
       child: Container(
         width: 120, // Set the card width for horizontal scrolling
         decoration: BoxDecoration(
-          color: Color(0xffF5F5F5),
+          color: Color(0xfff4f6f7),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -56,33 +52,44 @@ class CategoryCard extends GetView<HomeControllerImp> {
             ),
           ],
         ),
-        child: Column(
-          children: [
-            // Image Container
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: CachedNetworkImage(
-                imageUrl: "${AppLink.imagestCategories}/${categoriesModel.categoriesImage}",
-                fit: BoxFit.cover,
-                height: 90, // Adjust the height of the image
-                width: double.infinity,
-              ),
-            ),
-            // Category Name
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "${translateDatabase(categoriesModel.categoriesNameAr, categoriesModel.categoriesName)}",
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  overflow: TextOverflow.ellipsis, // Handle long text
-                  color: Colors.black,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            children: [
+              // Background Image
+              Positioned.fill(
+                child:CachedNetworkImage(
+                  imageUrl: "${AppLink.imagestCategories}/${categoriesModel.categoriesImage}",
+                  fit: BoxFit.cover,// Ensure image fits within the space
+                  alignment : Alignment. center,
+                  placeholder: (context, url) => CircularProgressIndicator(
+                    color: AppColor.primaryColor,
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red),
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              // Category Name Overlay
+              Positioned(
+                top:-5,
+                bottom: 70,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    "${translateDatabase(categoriesModel.categoriesNameAr, categoriesModel.categoriesName)}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis, // Handle long text
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

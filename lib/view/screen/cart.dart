@@ -1,75 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controller/cart_controller.dart';
-import '../../core/class/handlingdataview.dart';
-import '../widget/cart/appbarcart.dart';
+import '../../controller/cartlocal_controller.dart';
+import '../../core/constant/color.dart';
+import '../widget/cart/buttoncart.dart';
 import '../widget/cart/custom_bottom_navgationbar_cart.dart';
 import '../widget/cart/customitemscartlist.dart';
 import '../widget/cart/topcardcart.dart';
-
 class Cart extends StatelessWidget {
   const Cart({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    CartController cartController = Get.put(CartController());
+    final cartControllerLocal = Get.find<CartControllerLocal>();
     return Scaffold(
-        bottomNavigationBar: GetBuilder<CartController>(
-            builder: (controller) => BottomNavgationBarCart(
-                controllercoupon: controller.controllercoupon!,
-                onApplyCoupon: () {
-                  controller.checkcoupon();
-                },
-                price: cartController.priceorders.toStringAsFixed(2),
-                discount: "${controller.discountcoupon}%",
-                totalprice: "${controller.getTotalPrice().toStringAsFixed(2)}")),
-        body: GetBuilder<CartController>(
-            builder: ((controller) => HandlingDataView(
-                statusRequest: controller.statusRequest,
-                widget: ListView(
-                  children: [
-                     TopAppbarCart(
-                      title: '71'.tr,
-                    ),
-                    const SizedBox(height: 10),
-                    TopCardCart(
-                        message:"72".tr + "  ${cartController.totalcountitems}  " + "73".tr),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          ...List.generate(
-                            cartController.data!.length,
-                                (index) => CustomItemsCartList(
-                                count: cartController.data![index].cartitemisbox==1?"${cartController.data![index].countitems!~/cartController.data![index].itemsquantityinbox!.toInt()}":cartController.data![index].countitems!.toString(),
-                                onAdd: () async {
-                                  await cartController
-                                      .add(cartController.data![index].itemsId!,
-                                      cartController.data![index].cartitemisbox!.toString(),
-                                    cartController.getPrice(cartController.data![index])!.toString(),
-                                      cartController.data![index].cartitemisbox==1? cartController.data![index].itemsquantityinbox!:1,
-                                  );
-                                  cartController.refreshPage();
-                                },
-                                  onRemove: () async {
-                                  await cartController.delete(
-                                      cartController.data![index].itemsId!,
-                                      cartController.data![index].cartitemisbox==1? cartController.data![index].itemsquantityinbox!:1,
-                                  );
-                                  cartController.refreshPage();
-                                },
-                                imagename:
-                                "${cartController.data?[index].itemsImage}",
-                                name: "${cartController.data?[index].itemsName}",
-                                price:
-                                "${cartController.getPrice(cartController.data![index]).toStringAsFixed(2)  } SAR",
-
-                                ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                )))));
+      body: Obx(() => ListView(
+        children: [
+          AppBar(
+            backgroundColor: AppColor.primaryColor,
+            title: Text('71'.tr, style: TextStyle(color: Colors.white)),
+          ),
+          const SizedBox(height: 10),
+          TopCardCart(
+            message: "${"72".tr}  ${cartControllerLocal.cartItems.length}  ${"73".tr}",
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                ...cartControllerLocal.cartItems.map(
+                        (item) => CustomItemsCartList(cartItemModel: item)
+                ),
+                BottomNavgationBarCart(
+                    controllercoupon: cartControllerLocal.controllercoupon!,
+                    onApplyCoupon: cartControllerLocal.checkcoupon,
+                    price: cartControllerLocal.totalPrice.toStringAsFixed(2),
+                    discount: "${cartControllerLocal.discountcoupon.value}%",
+                    totalprice: cartControllerLocal.getOrderPrice.toStringAsFixed(2)
+                )
+              ],
+            ),
+          ),
+        ],
+      )
+      ),
+      bottomNavigationBar: CustomButtonCart(
+        textbutton: "132".tr,
+        onPressed: cartControllerLocal.goToPageCheckout,
+      ),
+    );
   }
 }

@@ -1,62 +1,61 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controller/cartlocal_controller.dart';
 import '../../controller/home_controller.dart';
-import '../../core/class/handlingdataview.dart';
 import '../../core/constant/routes.dart';
 import '../../data/model/itemsmodel.dart';
 import '../../linkabi.dart';
-import '../widget/customappbar.dart';
 import '../widget/home/ImageSliderScreen.dart';
+import '../widget/home/bestofferslisthome.dart';
 import '../widget/home/customtitlehome.dart';
 import '../widget/home/listcategorieshome.dart';
 import '../widget/home/listitemshome.dart';
+import '../widget/items/customappbaritems.dart';
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
+    final cartControllerLocal = Get.find<CartControllerLocal>();
     Get.put(HomeControllerImp());
     return GetBuilder<HomeControllerImp>(
         builder: (controller) => Container(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: ListView(
               children: [
-                CustomAppBar(
-                  mycontroller: controller.search!,
-                  titleappbar: "58".tr,
-                  // onPressedIcon: () {},
-                  onPressedSearch: () {
-                    controller.onSearchItems();
-                  },
-                  onChanged: (val) {
-                    controller.checkSearch(val);
-                  },
-                  onPressedIconFavorite: () {
-                    Get.toNamed(AppRoute.myfavroite);
-                  },
-                ),
-                HandlingDataView(
-                    statusRequest: controller.statusRequest,
-                    widget: !controller.isSearch
+                 Obx((){
+                   return CustomAppBarItems(
+                     mycontroller: controller.search!,
+                     titleappbar: "58".tr,
+                     onPressedSearch: () {
+                       controller.onSearchItems();
+                     },
+                     onChanged: (val) {
+                       controller.checkSearch(val);
+                     },
+                     onPressedIconCart: () => Get.toNamed(AppRoute.cart),
+                     itemCount:cartControllerLocal.cartItems.length,
+                   );
+                    }
+                 ),
+                !controller.isSearch
                         ?  Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ImageSlider(),
                         CustomTitleHome(title: "59".tr),
                         ListCategories(),
+                        CustomTitleHome(title: "200".tr),
+                        BestOffersListHome(),
                         CustomTitleHome(title: "60".tr),
-                        SizedBox(height: 5),
-                        ListItemsHome(),
+                        BestSillingItemsList(),
                       ],
                     )
                         : ListItemsSearch(listdatamodel: controller.listdata)
-                )
-
-                // const CustomTitleHome(title: "Offer"),
-                // const ListItemsHome()
               ],
-            )));
+            )
+        )
+    );
   }
 }
 

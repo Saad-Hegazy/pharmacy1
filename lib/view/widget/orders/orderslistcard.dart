@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../controller/orders/pending_controller.dart';
 import '../../../core/constant/color.dart';
 import 'package:flutter/material.dart';
@@ -18,28 +19,29 @@ class CardOrdersList extends GetView<OrdersPendingController> {
             children: [
               Row(
                 children: [
-                  Text("112".tr + ": #${listdata.ordersId}",
+                  Text("${"112".tr}: #${listdata.ordersId}",
                       style: const TextStyle(
 
                           fontSize: 18, fontWeight: FontWeight.bold)),
                   const Spacer(),
                   // Text(listdata.ordersDatetime!)
-                  Text(
-                    listdata.ordersDatetime!,
-                    style: const TextStyle(
-                        color: AppColor.primaryColor,
-                        fontWeight: FontWeight.bold),
-                  )
+        Text(
+          DateFormat('dd-MMM-yyyy').format(
+            DateTime.parse(listdata.ordersDatetime!,),
+          ),    style: const TextStyle(
+            color: AppColor.primaryColor,
+            fontSize:12),
+        )
                 ],
               ),
               const Divider(),
-              Text("113".tr + ":${controller.printOrderType(listdata.ordersType!)}"),
-              Text("114".tr + ": ${listdata.ordersPrice?.toStringAsFixed(2)} SAR"),
-              Text("115".tr + ": ${listdata.ordersPricedelivery?.toStringAsFixed(2)} SAR"),
-              Text("116".tr + ": ${controller.printPaymentMethod(listdata.ordersPaymentmethod!)}"),
-              Text("117".tr+": ${controller.printOrderStatus(listdata.ordersStatus!)}"),
+              Text("${"113".tr}:${controller.printOrderType(listdata.ordersType!)}"),
+              Text("${"114".tr}: ${listdata.ordersPrice?.toStringAsFixed(2)} ${"215".tr}"),
+              Text("${"115".tr}: ${listdata.ordersPricedelivery?.toStringAsFixed(2)} ${"215".tr}"),
+              Text("${"116".tr}: ${controller.printPaymentMethod(listdata.ordersPaymentmethod!)}"),
+              Text("${"117".tr}: ${controller.printOrderStatus(listdata.ordersStatus!)}"),
               const Divider(),
-              Text("118".tr + ": ${listdata.ordersTotalprice!.toStringAsFixed(2)} SAR ",
+              Text("${"118".tr}: ${listdata.ordersTotalprice!.toStringAsFixed(2)} ${"215".tr}" ,
                         style: const TextStyle(
                             color: AppColor.primaryColor,
                             fontWeight: FontWeight.bold)),

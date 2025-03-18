@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controller/cartlocal_controller.dart';
+import '../../../controller/favorite_controller.dart';
 import '../../../controller/home_controller.dart';
 import '../../../core/constant/color.dart';
 import '../../../core/functions/translatefatabase.dart';
@@ -8,21 +10,25 @@ import '../../../core/functions/truncatetext.dart';
 import '../../../data/model/itemsmodel.dart';
 import '../../../linkabi.dart';
 
-class ListItemsHome extends GetView<HomeControllerImp> {
-  const ListItemsHome({Key? key}) : super(key: key);
+class BestSillingItemsList extends GetView<HomeControllerImp> {
+  const BestSillingItemsList({Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-          itemCount: controller.items.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, i) {
-            return ItemsHome(
-                itemsModel: ItemsModel.fromJson(controller.items[i]));
-          }),
-    );
+    // Featured Products Grid
+    return GridView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.9,
+        ),
+        itemCount:controller.items.length,
+        itemBuilder: (context, i) {
+          return ItemsHome(
+              itemsModel: ItemsModel.fromJson(controller.items[i]));
+        });
   }
 }
 
@@ -32,53 +38,168 @@ class ItemsHome extends GetView<HomeControllerImp> {
 
   @override
   Widget build(BuildContext context) {
+    final cartControllerLocal = Get.find<CartControllerLocal>();
+    final favoriteController = Get.find<FavoriteController>();
     return InkWell(
-      onTap: (){
-        controller.goToPageProductDetails(itemsModel);
+      onTap: () {
+        controller.goToPageProductDetails(itemsModel,);
       },
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal:5, vertical: 0),
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              color: Color(0xfff4f6f7),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                ),
-              ],
-            ),
-            child: CachedNetworkImage(
-              imageUrl:"${AppLink.imagestItems}/${itemsModel.itemsImage}",
-              height: 100,
-              width: 100,
-              fit: BoxFit.fill,
-            ),
+      child: Card(
+        color: AppColor.backgroundcolor2,
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ConstrainedBox( // Add constrained box to limit height
+          constraints: BoxConstraints(
+            minHeight: 180, // Set minimum height
+            maxHeight: 220, // Set maximum height based on your design
           ),
-          // Container(
-          //   decoration: BoxDecoration(
-          //       color: AppColor.black.withOpacity(0.2),
-          //       borderRadius: BorderRadius.circular(20)),
-          //   height: 120,
-          //   width: 105,
-          // ),
-          Positioned(
-            top: 100,
-            bottom: 0,
-            right: 0,
-            left: 0,
-              child:Text(translateDatabase(
-                  itemsModel.itemsNameAr.toString(),truncateProductName(itemsModel.itemsName.toString()) ),
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 12,
-                      overflow: TextOverflow.ellipsis,
-                      fontWeight: FontWeight.bold),textAlign: TextAlign.center,),)
-        ],
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min, // Prevent column from expanding
+                  children: [
+                    Expanded( // Use Expanded for the image section
+                      flex: 3, // Adjust flex values as needed
+                      child: Hero(
+                        tag: "${itemsModel.itemsId}",
+                        child: CachedNetworkImage(
+                          imageUrl: "${AppLink.imagestItems}/${itemsModel.itemsImage!}",
+                          height: 80,
+                          width: 80,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.center,
+                          placeholder: (context, url) => CircularProgressIndicator(
+                            color: AppColor.primaryColor,
+                          ),
+                          errorWidget: (context, url, error) => Icon(Icons.error, color: Colors.red),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4), // Add spacing
+                    Expanded( // Use Expanded for text sections
+                      flex: 2,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            translateDatabase(
+                              truncateProductName(itemsModel.itemsNameAr.toString()),
+                              truncateProductName(itemsModel.itemsName.toString()),
+                            ),
+                            style: TextStyle(
+                                height: 0.9,
+                                color: AppColor.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold
+                            ),
+                            maxLines: 1, // Ensure single line
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            itemsModel.itemPriceBox!.toStringAsFixed(2) +"215".tr ,
+                            style: TextStyle(
+                              color: AppColor.primaryColor,
+                              fontSize: 14,
+                            ),
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded( // Use Expanded for cart controls
+                      flex: 2,
+                      child:                    // Reactive cart controls
+                      Obx(() {
+                        final existingIndex = cartControllerLocal.cartItems.indexWhere(
+                                (item) => item.item.itemsId == itemsModel.itemsId
+                        );
+                        final isInCart = existingIndex != -1;
+
+                        return isInCart ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Delete/Decrement button
+                            IconButton(
+                              onPressed: () {
+                                if (cartControllerLocal.cartItems[existingIndex].quantity < 2) {
+                                  cartControllerLocal.deleteFromCart(itemsModel.itemsId!);
+                                } else {
+                                  cartControllerLocal.removeFromCart(itemsModel, 1, 1);
+                                }
+                              },
+                              icon: Icon(
+                                cartControllerLocal.cartItems[existingIndex].quantity < 2
+                                    ? Icons.delete
+                                    : Icons.remove_circle_outline,
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                            // Quantity display
+                            Text(
+                              "${cartControllerLocal.cartItems[existingIndex].quantity}",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                            // Increment button
+                            IconButton(
+                              onPressed: () {
+                                cartControllerLocal.addToCart(itemsModel, 1, 1);
+                              },
+                              icon: Icon(
+                                Icons.add_circle_outline,
+                                color: AppColor.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ) : TextButton.icon(
+                          onPressed: () {
+                            cartControllerLocal.addToCart(itemsModel, 1, 1);
+                          },
+                          label: Text(
+                            "100".tr,
+                            style: TextStyle(
+                              color: AppColor.primaryColor,
+                              fontSize: 16,
+                            ),
+                          ),
+                          icon: Icon(
+                            Icons.shopping_cart,
+                            color: AppColor.primaryColor,
+                            size: 25,
+                          ),
+                        );
+                      }
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 0,
+                child: IconButton(
+                  icon: Obx(() => Icon(
+                    favoriteController.isFavorite(itemsModel)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: AppColor.primaryColor,
+                  )),
+                  onPressed: () => favoriteController.toggleFavorite(itemsModel),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
